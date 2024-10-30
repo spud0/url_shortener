@@ -11,6 +11,33 @@ type URLMap struct {
 }
 
 func (um *URLMap) Shorten (writer http.ResponseWriter, req *http.Request) {
+		
+	if req.Method != http.MethodPost {
+		http.Error(writer, "Invalid request method.", http.StatusMethodNotAllowed)
+		return
+	}	
+
+	longURL := req.FormValue("url") 
+	if longURL == "" {
+		http.Error(writer, "The URL is missing.", http.StatusBadRequest)
+		return
+	}
+
+	shortKey := "1"
+	um.urls[shortKey] = longURL
+	shortened := fmt.Sprintf("http://localhost:8080/shortened/%s", shortKey)
+
+	writer.Header().Set("Content-Type", "text/html")
+	responseHTML := fmt.Sprintf(`
+		<h2>URL Shortener</h2>
+		<p>Original URL: %s</p>
+		<p>Shortened URL: <a href="%s">%s</a></p>
+		<form method="post" action="/link">
+			<input type="text" name="url" placeholder="Enter a URL">
+			<input type="submit" value="Shorten">
+		</form>
+	`, longURL, shortened, shortened)
+	fmt.Fprintf(writer, responseHTML)
 
 }
 
@@ -31,14 +58,31 @@ func (um *URLMap) Redirected (writer http.ResponseWriter, req *http.Request) {
 	http.Redirect(writer, req, longURL, http.StatusMovedPermanently)
 }
 
+func (um *URLMap) Index (writer http.ResponseWriter, req *http.Request) {
+
+	if req.Method == http.MethodGet {
+		writer.Header().Set("Content-Type", "text/html")
+		formHTML := `
+			<h2>URL Shortener</h2>
+			<form method="post" action="/link">
+				<input type="text" name="url" placeholder="Enter a URL">
+				<input type="submit" value="Shorten">
+			</form>
+		`
+		fmt.Fprint(writer, formHTML)
+		return
+	}
+}
+
 func main () {
 
 	shortener := &URLMap {
 		urls: make(map[string]string),
 	}
 	
-	http.HandleFunc("/link", shortener.Shorten)
 	http.HandleFunc("/shortened/", shortener.Redirected)	
+	http.HandleFunc("/link", shortener.Shorten)
+	http.HandleFunc("/", shortener.Index)
 
 	fmt.Println("Started server on port 8080.")
 	http.ListenAndServe(":8080", nil)
