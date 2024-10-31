@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
-	// "time"
+	"github.com/spud0/url_shortener/internal"
 )
 
+// Replace with DB connection
+// Also add caching to check for 
 type URLMap struct {
 	urls map[string]string
 }
@@ -85,6 +87,10 @@ func main () {
 	http.HandleFunc("/", shortener.Index)
 
 	fmt.Println("Started server on port 8080.")
+
+	value := internal.Nothing()
+	fmt.Println("Value from package is:", value)
+
 	http.ListenAndServe(":8080", nil)
 
 }
