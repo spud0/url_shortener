@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"github.com/spud0/url_shortener/internal"
+	"github.com/spud0/url_shortener/internal/utils"
+	"github.com/spud0/url_shortener/internal/db"
+	// "github.com/spud0/url_shortener/internal/cache"
 )
 
 // Replace with DB connection
@@ -88,7 +90,7 @@ func main () {
 
 	fmt.Println("Started server on port 8080.")
 
-	value := internal.Nothing()
+	value := internal.MakeHash("hello, world")
 	fmt.Println("Value from package is:", value)
 
 	http.ListenAndServe(":8080", nil)
