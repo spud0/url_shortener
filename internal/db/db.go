@@ -39,9 +39,11 @@ func (db *DB) SaveURL (url string) error {
 	return err	
 }
 
+
+// Gets the long URL from the DB
 func (db *DB) GetURL (hashedKey string) (string, error) {
 	var longURL string
-	err := db.Conn.QueryRow("...", hashedKey).Scan(&longURL)
+	err := db.Conn.QueryRow("SELECT long_url FROM urls WHERE short_key = $1", hashedKey).Scan(&longURL)
 	return longURL, err	
 }
 	
