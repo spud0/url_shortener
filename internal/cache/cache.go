@@ -1,14 +1,29 @@
-package internal 
+package cache  
 
 import (
 	"context"
 	"github.com/redis/v9"
 	"net/http"
+	"os"
 )
 
 // Caching scaffolding
 type Cache struct {
 	Client *redis.Client
+}
+
+func NewCache () *Cache {
+	addr, passwd := os.Getenv("ADDR"), os.Getenv("CPASS")
+	db := os.Getenv("DB_NUM")
+
+	redisClient := redis.NewClient(&redis.Options {
+		Addr: addr,
+		Password: passwd,
+		DB: db,
+	})
+	
+	return &Cache{Client: redisClient}	
+
 }
 
 // Open a connection to the metrics platform to decide if the URL should be cached
