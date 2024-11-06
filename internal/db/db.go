@@ -1,4 +1,4 @@
-package internal
+package db 
 
 import (
 	"database/sql"
@@ -14,7 +14,7 @@ type DB struct {
 }
 
 // Initializes a new connection to the database.
-func (db *DB) newDB ()  (*DB, error) {
+func NewDB ()  (*DB, error) {
 	
 	// Getting the environment variables
 	port, dbName := os.Getenv("PORT"), os.Getenv("NAME")
@@ -34,16 +34,17 @@ func (db *DB) newDB ()  (*DB, error) {
 	
 }
 
+// Puts the URL into the DB.
 func (db *DB) SaveURL (url string) error {
 	_, err := db.Conn.Exec("...")
 	return err	
 }
 
 
-// Gets the long URL from the DB
+// Gets the long URL from the DB.
 func (db *DB) GetURL (hashedKey string) (string, error) {
 	var longURL string
-	err := db.Conn.QueryRow("SELECT long_url FROM urls WHERE short_key = $1", hashedKey).Scan(&longURL)
+	err := db.Conn.QueryRow ("SELECT long_url FROM urls WHERE short_key = $1", hashedKey).Scan(&longURL)
 	return longURL, err	
 }
 	
